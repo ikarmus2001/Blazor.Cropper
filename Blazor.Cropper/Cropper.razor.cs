@@ -645,17 +645,17 @@ public partial class Cropper : ComponentBase, IAsyncDisposable
             {
                 await resizedImageFile.OpenReadStream(1024 * 1024 * 90).ReadAsync(buffer);
             }
+
             if ((ext == "gif" && AnimeGifEnable) || PureCSharpProcessing)
             {
-                _gifimage = Image.Load(buffer, out _format);
-                await JSRuntime.InvokeVoidAsync("setImgSrc", buffer, _format.DefaultMimeType, _cropperElmRef, _dimg, _oriImg);
+                _gifimage = Image.Load(buffer);
+                await JSRuntime.InvokeVoidAsync("setImgSrc", buffer, SixLabors.ImageSharp.Formats.Gif.GifFormat.Instance.DefaultMimeType, _cropperElmRef, _dimg, _oriImg);
             }
             else
             {
-
                 var m = Configuration.Default.ImageFormatsManager;
 
-                _format = m.FindFormatByFileExtension(ext) ?? PngFormat.Instance;
+                _format = m.TryFindFormatByFileExtension(ext, out var newFormat) ? newFormat : PngFormat.Instance;
                 await JSRuntime.InvokeVoidAsync("setImgSrc", buffer, "image/" + ext, _cropperElmRef, _dimg, _oriImg);
             }
         }

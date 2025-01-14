@@ -1,16 +1,11 @@
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Webp;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Bmp;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats.Tiff;
-using SixLabors.ImageSharp.Formats.Webp;
-using SixLabors.ImageSharp.Formats.Tga;
-using SixLabors.ImageSharp.Formats.Pbm;
 
 namespace Blazor.Cropper
 {
@@ -38,6 +33,7 @@ namespace Blazor.Cropper
             _data = bytes;
             Format = format;
         }
+
 #if NET6_0_OR_GREATER
         [Obsolete("this api is obsolete in dotnet 6 for bad performance")]
 #endif
@@ -103,19 +99,15 @@ namespace Blazor.Cropper
 
         private IImageEncoder GetImageEncoder(IImageFormat format, int quality)
         {
-            var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(Format);
-            switch (encoder)
-            {
-                case JpegEncoder e:
-                    e.Quality = Quality;
-                    break;
-                case WebpEncoder e:
-                    e.Quality = Quality;
-                    break;
-                default:
-                    break;
-            }
-            return encoder;
+            return Configuration.Default.ImageFormatsManager.GetEncoder(format);
+
+            // TODO is that needed?
+            //var encoder = Configuration.Default.ImageFormatsManager.GetEncoder(format);
+            //encoder.Quality = encoder switch
+            //{
+            //    JpegEncoder or WebpEncoder => quality
+            //};
+            //return encoder;
         }
 
 #if NET6_0_OR_GREATER
